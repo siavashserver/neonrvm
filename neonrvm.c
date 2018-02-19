@@ -200,20 +200,25 @@ NEONRVM_API int neonrvm_destroy_cache(neonrvm_cache* cache)
         return NEONRVM_INVALID_P1;
     }
 
-    nfree(cache->m_alpha_diag);
-    nfree(cache->m_phi);
-    nfree(cache->m_phiTphi);
-    nfree(cache->m_sigma);
+    /* no need to free up unallocated memory space */
+    if (0 != cache->n_reserved) {
+        nfree(cache->m_alpha_diag);
+        nfree(cache->m_phi);
+        nfree(cache->m_phiTphi);
+        nfree(cache->m_sigma);
 
-    nfree(cache->v_alpha);
-    nfree(cache->v_alpha_old);
+        nfree(cache->v_alpha);
+        nfree(cache->v_alpha_old);
+
+        nfree(cache->v_gamma);
+        nfree(cache->v_mu);
+        nfree(cache->v_phiTy);
+
+        nfree(cache->v_index);
+    }
+
     nfree(cache->v_error);
-    nfree(cache->v_gamma);
-    nfree(cache->v_mu);
-    nfree(cache->v_phiTy);
     nfree(cache->v_y);
-
-    nfree(cache->v_index);
 
     nfree(cache);
 
