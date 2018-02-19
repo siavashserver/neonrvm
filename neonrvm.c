@@ -209,7 +209,6 @@ NEONRVM_API int neonrvm_destroy_cache(neonrvm_cache* cache)
 
         nfree(cache->v_alpha);
         nfree(cache->v_alpha_old);
-
         nfree(cache->v_gamma);
         nfree(cache->v_mu);
         nfree(cache->v_phiTy);
