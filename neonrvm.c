@@ -61,6 +61,7 @@ extern lapack_int LAPACKE_dpotrs(int matrix_layout, char uplo, lapack_int n, lap
 NEONRVM_STATIC void* nextend(void* mem_addr, size_t count, size_t size, bool keep_content)
 {
     if ((0 == count) || (0 == size) || (count > SIZE_MAX / size)) {
+        assert(0);
         abort();
     }
 
