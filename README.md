@@ -1,7 +1,9 @@
 # Introduction
 
-**neonrvm** is an experimental open source machine learning library written in C 
-programming language for performing regression tasks using [RVM] technique. 
+**neonrvm** is an experimental open source machine learning library for 
+performing regression tasks using [RVM] technique. It is written in C 
+programming language and comes with bindings for the Python programming 
+language.
 
 Under the hood neonrvm uses expectation maximization fitting method, and allows 
 basis functions to be fed incrementally to the model. This helps to keep training 
@@ -30,10 +32,23 @@ neonrvm requires a linear algebra library providing CBLAS/LAPACKE
 interface to do its magic. Popular ones are [Intel MKL], [OpenBLAS], and 
 the reference [Netlib LAPACKE].
 
+Python bindings can be installed from the source package using [Flit] Python 
+module by simply running:
+```Shell
+flit install
+```
+
+or from [PyPI] software repository using following command:
+```Shell
+pip install neonrvm
+```
+
 [CMake]: https://cmake.org/
 [Intel MKL]: https://software.intel.com/mkl
 [OpenBLAS]: http://www.openblas.net/
 [Netlib LAPACKE]: http://www.netlib.org/lapack/
+[Flit]: https://github.com/takluyver/flit
+[PyPI]: https://pypi.python.org/pypi
 
 ---
 
@@ -41,9 +56,14 @@ the reference [Netlib LAPACKE].
 
 Congratulations, you survived the build process! Following are general tips 
 and steps in order to train your model and perform predictions using neonrvm. 
-Please have a look at `example.c` for a working sample code. At this point it's 
-a good idea to grab the original RVM paper and other related papers to get a 
-feeling of inner workings of the RVM technique and different parameters.
+Please have a look at `example.c` and `example.py` for working sample codes. 
+At this point it's a good idea to grab the original RVM paper and other related 
+papers to get a feeling of inner workings of the RVM technique and different 
+parameters.
+
+In order to keep repetitions in this document lower, Python bindings are 
+briefly documented. Errors reported by the library, will be raised as 
+exceptions in Python.
 
 [Sparse Bayesian Models (and the RVM)](http://www.miketipping.com/sparsebayes.htm)
 
@@ -97,8 +117,11 @@ need to prepare a 2D `m*m` matrix.
 
 `neonrvm_cache` structure acts as a cache for storing a couple of intermediate 
 training results and allows us to reuse memory as much as possible during 
-learning process. You can create one using `neonrvm_create_cache` function 
-described below:
+learning process.
+
+### C/C++
+
+You can create one using `neonrvm_create_cache` function described below:
 
 ```C
 int neonrvm_create_cache(neonrvm_cache** cache, double* y, size_t count)
@@ -128,10 +151,26 @@ int neonrvm_destroy_cache(neonrvm_cache* cache)
 - `NEONRVM_SUCCESS`: After successful execution.
 - `NEONRVM_INVALID_Px`: When facing erroneous parameters.
 
+### Python
+
+You simply need to create a new `Cache` instance, no need for manual memory 
+management.
+
+```Python
+class Cache(y: numpy.ndarray)
+```
+
+*Returns*  
+- A new `Cache` instance.
+
 ## Step 3: Creating training parameters
 
 `neonrvm_param` structure deals with training convergence conditions and 
-initial values. Use `neonrvm_create_param` function to create one:
+initial values.
+
+### C/C++
+
+Use `neonrvm_create_param` function to create one:
 
 ```C
 int neonrvm_create_param(neonrvm_param** param, 
@@ -173,6 +212,18 @@ int neonrvm_destroy_param(neonrvm_param* param)
 - `NEONRVM_SUCCESS`: After successful execution.
 - `NEONRVM_INVALID_Px`: When facing erroneous parameters.
 
+### Python
+
+A new `Param` instance should be created:
+
+```Python
+class Param(alpha_init: float, alpha_max: float, alpha_tol: float,
+            beta_init: float, basis_percent_min: float, iter_max: int)
+```
+
+*Returns*  
+- A new `Param` instance.
+
 ## Step 4: Training the model
 
 `neonrvm_train` function requires a pair of training parameter structures, one 
@@ -201,6 +252,7 @@ more relaxed convergence conditions. In other words, a highly polished and
 sparse model isn't required.
 
 ### B) Finalized kernel parameters and model
+
 When you are finished with tuning kernel parameters and trying different model 
 creation ideas, you need access to the best basis functions and finely tuned 
 weights associated to them in order to make accurate predictions.
@@ -210,6 +262,7 @@ parameters with low basis function percentage and high iteration count for the
 polishing step in this case.
 
 ### 🍔) Big data sets
+
 Memory and storage requirements do quickly skyrocket when dealing with large 
 data sets. You don't necessarily need to feed the whole design matrix to the 
 neonrvm all at once. It can also be fed in smaller chunks by loading different 
@@ -219,6 +272,8 @@ neonrvm allows users to split the design matrix and perform the training
 process incrementally at higher level through caching mechanism provided. You 
 just need to make multiple `neonrvm_train` function calls and neonrvm will 
 store the useful basis functions in the given `neonrvm_cache` on the go.
+
+### C/C++
 
 Alright, now that we covered the different use cases, it's time to get familiar 
 with the `neonrvm_train` function:
@@ -254,6 +309,16 @@ int neonrvm_train(neonrvm_cache* cache, neonrvm_param* param1, neonrvm_param* pa
     equations.
 - `NEONRVM_MATH_ERROR`: When `NaN` or `∞` numbers show up in the calculations.
 
+### Python
+
+```Python
+def train(cache: Cache, param1: Param, param2: Param,
+          phi: numpy.ndarray, index: numpy.ndarray, batch_size_max: int)
+```
+
+*Returns*  
+- Nothing that I'm aware of.
+
 [SciPy]: https://www.scipy.org/
 
 ## Step 5: Getting the training results
@@ -265,6 +330,8 @@ useful basis function indices and their associated weights can be queried using
 You should first get the useful basis functions count, and then allocate enough 
 memory for the basis function indices and weights vectors so neonrvm can fill 
 them for you.
+
+### C/C++
 
 ```C
 int neonrvm_get_training_stats(neonrvm_cache* cache, size_t* basis_count, bool* bias_used)
@@ -296,6 +363,20 @@ int neonrvm_get_training_results(neonrvm_cache* cache, size_t* index, double* mu
 - `NEONRVM_SUCCESS`: After successful execution.
 - `NEONRVM_INVALID_Px`: When facing erroneous parameters.
 
+### Python
+
+A single function call is enough:
+
+```Python
+def get_training_results(cache: Cache)
+```
+
+*Returns*  
+- `index`: `numpy.ndarray`
+- `mu`: `numpy.ndarray`
+- `basis_count`: `int`
+- `bias_used`: `bool`
+
 ## Step 6: Profit!
 
 Now that you have the indices and weights of the useful data in hand, you can 
@@ -311,8 +392,11 @@ number of useful basis functions.
 
 Prediction are made simply by multiplying the result matrix and weights vector. 
 Output vector with a lenghts equal to the number of new input data samples 
-contains the prediction outcomes. You can use the `neonrvm_predict` function to 
-make predictions.
+contains the prediction outcomes.
+
+### C/C++
+
+You can use the `neonrvm_predict` function to make predictions.
 
 ```C
 int neonrvm_predict(double* phi, double* mu,
@@ -333,6 +417,17 @@ int neonrvm_predict(double* phi, double* mu,
 - `NEONRVM_SUCCESS`: After successful execution.
 - `NEONRVM_INVALID_Px`: When facing erroneous parameters.
 - `NEONRVM_MATH_ERROR`: When `NaN` or `∞` numbers show up in the calculations.
+
+### Python
+
+Number of `phi` columns and `mu` length should match.
+
+```Python
+def predict(phi: np.ndarray, mu: np.ndarray)
+```
+
+*Returns*  
+- `y`: `numpy.ndarray`
 
 ---
 

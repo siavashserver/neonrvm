@@ -1,0 +1,29 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "neonrvm"
+author = "Siavash Eliasi"
+author-email = "siavashserver@gmail.com"
+home-page = "https://github.com/siavashserver/neonrvm"
+
+requires=["numpy"]
+requires-python=">=3"
+
+dist-name="neonrvm"
+
+classifiers=[
+"Development Status :: 4 - Beta",
+"Intended Audience :: Developers",
+"License :: OSI Approved :: MIT License",
+"Natural Language :: English",
+"Operating System :: OS Independent",
+"Programming Language :: Python",
+"Topic :: Scientific/Engineering",
+"Topic :: Software Development"
+]
+
+keywords="Machine Learning Regression Relevance Vector Machine RVM Sparse Bayes"
+
+license="MIT"
