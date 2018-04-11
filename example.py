@@ -24,7 +24,7 @@ def generate_input_data(num_samples, range_x, scale_y, scale_noise):
 def generate_design_matrix(x, y, gamma, bias_used=False):
     design_matrix = rbf_kernel(x, y, gamma)
 
-    if bias_used is True:
+    if bias_used == True:
         design_matrix = np.append(design_matrix, np.ones_like(x), axis=1)
 
     return design_matrix
@@ -49,7 +49,7 @@ neonrvm.train(c, p1, p2, design_matrix, index_basis, 100)
 index_relevant, mu, basis_count, bias_used = neonrvm.get_training_results(c)
 
 # Printing the useful input data, and their associated weights
-if bias_used is True:
+if bias_used == True:
     index_relevant = index_relevant[:-1]
 
 x_rel = x[index_relevant]
@@ -61,7 +61,7 @@ for i in range(index_relevant.size):
                                                                                   x.item((index, 0)),
                                                                                   y.item((index, 0))))
 
-if bias_used is True:
+if bias_used == True:
     print("item: bias, mu: {:6.3f}".format(mu[-1]))
 
 # Test the model performance using the already preprocessed training data for the sake of simplicity

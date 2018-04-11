@@ -1,5 +1,5 @@
 """Python bindings for the neonrvm machine learning library."""
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 import ctypes as ct
 import ctypes.util as ctut
@@ -109,9 +109,9 @@ def _gen_err_str(err_code):
 def _get_index_dtype():
     c_size_t_size = ct.sizeof(ct.c_size_t)
 
-    if c_size_t_size is 4:
+    if c_size_t_size == 4:
         return np.uint32
-    elif c_size_t_size is 8:
+    elif c_size_t_size == 8:
         return np.uint64
     else:
         raise RuntimeError("Unhandled size_t size has been detected.")
@@ -130,13 +130,13 @@ class Cache:
 
         status = _lib.neonrvm_create_cache(ct.byref(self.c), y, count)
 
-        if status is not 0:
+        if status != 0:
             raise RuntimeError(_gen_err_str(status))
 
     def __del__(self):
         status = _lib.neonrvm_destroy_cache(self.c)
 
-        if status is not 0:
+        if status != 0:
             raise RuntimeError(_gen_err_str(status))
 
 
@@ -148,13 +148,13 @@ class Param:
         status = _lib.neonrvm_create_param(ct.byref(self.p), alpha_init, alpha_max, alpha_tol,
                                            beta_init, basis_percent_min, iter_max)
 
-        if status is not 0:
+        if status != 0:
             raise RuntimeError(_gen_err_str(status))
 
     def __del__(self):
         status = _lib.neonrvm_destroy_param(self.p)
 
-        if status is not 0:
+        if status != 0:
             raise RuntimeError(_gen_err_str(status))
 
 
@@ -166,7 +166,7 @@ def train(cache: Cache, param1: Param, param2: Param,
 
     status = _lib.neonrvm_train(cache.c, param1.p, param2.p, phi, index, count, batch_size_max)
 
-    if status is not 0:
+    if status != 0:
         raise RuntimeError(_gen_err_str(status))
 
 
@@ -176,7 +176,7 @@ def get_training_results(cache: Cache):
 
     status = _lib.neonrvm_get_training_stats(cache.c, ct.byref(basis_count), ct.byref(bias_used))
 
-    if status is not 0:
+    if status != 0:
         raise RuntimeError(_gen_err_str(status))
 
     basis_count = basis_count.value
@@ -190,7 +190,7 @@ def get_training_results(cache: Cache):
 
     status = _lib.neonrvm_get_training_results(cache.c, index, mu)
 
-    if status is not 0:
+    if status != 0:
         raise RuntimeError(_gen_err_str(status))
 
     return index, mu, basis_count, bias_used
@@ -200,16 +200,16 @@ def predict(phi: np.ndarray, mu: np.ndarray):
     phi = np.asfortranarray(phi, dtype=np.double)
     mu = np.ascontiguousarray(mu, dtype=np.double)
 
-    if phi.ndim is 1:
+    if phi.ndim == 1:
         sample_count = 1
         basis_count = phi.shape[0]
-    elif phi.ndim is 2:
+    elif phi.ndim == 2:
         sample_count = phi.shape[0]
         basis_count = phi.shape[1]
     else:
         raise RuntimeError("Unsupported matrix dimension has been encountered.")
 
-    if mu.shape[0] is not basis_count:
+    if mu.shape[0] != basis_count:
         raise RuntimeError("Number of basis functions and weights don't match.")
 
     y = np.empty(sample_count, dtype=np.double)
@@ -217,7 +217,7 @@ def predict(phi: np.ndarray, mu: np.ndarray):
 
     status = _lib.neonrvm_predict(phi, mu, sample_count, basis_count, y)
 
-    if status is not 0:
+    if status != 0:
         raise RuntimeError(_gen_err_str(status))
 
     return y
@@ -230,7 +230,7 @@ def get_version():
 
     status = _lib.neonrvm_get_version(ct.byref(major), ct.byref(minor), ct.byref(patch))
 
-    if status is not 0:
+    if status != 0:
         raise RuntimeError(_gen_err_str(status))
 
     return major.value, minor.value, patch.value
