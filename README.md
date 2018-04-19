@@ -297,8 +297,7 @@ int neonrvm_train(neonrvm_cache* cache, neonrvm_param* param1, neonrvm_param* pa
     numbers, and shouldn't contain any value equal to the `SIZE_MAX`, which is 
     used internally to identify bias index.
 - `[in] count`: Number of basis functions given. Must be a positive non-zero 
-    number. Total number of basis functions shouldn't exceed the total number 
-    of samples.
+    number.
 - `[in] batch_size_max`: Maximum number of basis functions in every incremental 
     training session. Must be a positive non-zero value.
 

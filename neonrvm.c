@@ -319,10 +319,6 @@ NEONRVM_STATIC void resize_cache(neonrvm_cache* c)
     }
     c->n_reserved = (3 * c->n) / 2;
 
-    /* cap by num samples + (0: bias was useful in previous iteration, 1: need to add bias again) */
-    size_t n_max = c->m + (c->bias_used ? 0 : 1);
-    c->n_reserved = c->n_reserved < n_max ? c->n_reserved : n_max;
-
     /* reallocate space */
     if (c->m > SIZE_MAX / c->n_reserved) {
         /* avoid unsigned integer wrapping */
@@ -691,7 +687,8 @@ NEONRVM_API int neonrvm_train(neonrvm_cache* cache, neonrvm_param* param1, neonr
         return NEONRVM_INVALID_P5;
     }
 
-    if ((1 > count) || (count > cache->m - cache->n)) {
+    if ((1 > count) || (count > NEONRVM_MAT_DIM_MAX - cache->n - 1)) {
+        /* Reserved for bias ----------------------------------- ^ */
         assert(0);
         return NEONRVM_INVALID_P6;
     }
