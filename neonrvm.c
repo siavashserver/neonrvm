@@ -396,7 +396,7 @@ NEONRVM_STATIC void update_cache(neonrvm_cache* c, neonrvm_param* p, double* phi
     cblas_dgemv(CblasColMajor, CblasTrans, c->m, c->n, 1.0, c->m_phi, c->m, c->v_y, 1, 0.0, c->v_phiTy, 1);
 }
 
-NEONRVM_STATIC bool alpha_max_met(neonrvm_cache* c, neonrvm_param* p)
+NEONRVM_STATIC bool alpha_tol_met(neonrvm_cache* c, neonrvm_param* p)
 {
     double diff_max = 0.0;
 
@@ -406,7 +406,7 @@ NEONRVM_STATIC bool alpha_max_met(neonrvm_cache* c, neonrvm_param* p)
         diff_max = diff_max > diff ? diff_max : diff; /* max */
     }
 
-    bool result = p->alpha_tol > diff_max;
+    bool result = p->alpha_tol >= diff_max;
 
     return result;
 }
@@ -415,18 +415,20 @@ NEONRVM_STATIC bool pcnt_min_met(neonrvm_cache* c, neonrvm_param* p)
 {
     double pcnt = (c->n * 100.0) / c->n_train_current;
 
-    bool result = pcnt < p->pcnt_min;
+    bool result = pcnt <= p->pcnt_min;
 
     return result;
 }
 
-NEONRVM_STATIC bool convergence_conditions_met(neonrvm_cache* c, neonrvm_param* p)
+NEONRVM_STATIC bool convergence_conditions_met(neonrvm_cache* c, neonrvm_param* p, size_t iteration)
 {
-    bool condition1 = alpha_max_met(c, p);
+    bool condition1 = iteration > 1;
 
-    bool condition2 = pcnt_min_met(c, p);
+    bool condition2 = alpha_tol_met(c, p);
 
-    bool result = condition1 || condition2;
+    bool condition3 = pcnt_min_met(c, p);
+
+    bool result = (condition1 && condition2) || condition3;
 
     return result;
 }
@@ -576,7 +578,7 @@ NEONRVM_STATIC int main_training_loop(neonrvm_cache* c, neonrvm_param* p)
         int status = NEONRVM_SUCCESS;
 
         /* check for convergence */
-        if ((i > 1) && convergence_conditions_met(c, p)) {
+        if (true == convergence_conditions_met(c, p, i)) {
             break;
         }
 
