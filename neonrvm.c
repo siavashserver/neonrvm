@@ -40,7 +40,7 @@ extern lapack_int LAPACKE_dpotrs(int matrix_layout, char uplo, lapack_int n, lap
 
 #define NEONRVM_VERSION_MAJOR 0
 #define NEONRVM_VERSION_MINOR 1
-#define NEONRVM_VERSION_PATCH 0
+#define NEONRVM_VERSION_PATCH 1
 
 /* Defining private functions as static helps keeping library size low. */
 #define NEONRVM_STATIC static
