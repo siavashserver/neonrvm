@@ -656,6 +656,8 @@ NEONRVM_STATIC void move_bias(neonrvm_cache* c)
 
             memcpy(&c->m_phi[i * c->m], &c->m_phi[index_tail * c->m], c->m * sizeof(double));
             add_bias(c);
+
+            break;
         }
     }
 }
