@@ -645,7 +645,9 @@ NEONRVM_STATIC void move_bias(neonrvm_cache* c)
 {
     size_t index_tail = c->n - 1;
 
-    for (size_t i = 0; i < c->n; i++) {
+    for (size_t i = 0; i < index_tail; i++) {
+        /* ----------------^^^^^^^^^^ */
+        /* No need for execution when bias is already at the tail. */
         if (NEONRVM_BIAS_MAGIC == c->v_index[i]) {
             c->v_index[i] = c->v_index[index_tail];
             c->v_index[index_tail] = NEONRVM_BIAS_MAGIC;
