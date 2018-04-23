@@ -582,6 +582,8 @@ NEONRVM_STATIC int main_training_loop(neonrvm_cache* c, neonrvm_param* p)
             break;
         }
 
+        filter_basis_funcs(c, p);
+
         memcpy(c->v_alpha_old, c->v_alpha, c->n * sizeof(double));
 
         calc_sigma(c);
@@ -604,8 +606,6 @@ NEONRVM_STATIC int main_training_loop(neonrvm_cache* c, neonrvm_param* p)
         calc_alpha(c);
 
         calc_beta(c);
-
-        filter_basis_funcs(c, p);
 
         status = check_numbers(c);
         if (NEONRVM_SUCCESS != status) {
