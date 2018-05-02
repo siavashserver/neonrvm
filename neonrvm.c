@@ -38,7 +38,7 @@ char translate_transpose(CBLAS_TRANSPOSE transpose)
         return 'C';
     default:
         /* unknown value passed in */
-        assert(0);
+        assert(false);
         abort();
     }
 }
@@ -105,7 +105,7 @@ lapack_int LAPACKE_dpotrs(int matrix_layout, char uplo, lapack_int n, lapack_int
 /* Special identifier for bias */
 #define NEONRVM_BIAS_MAGIC SIZE_MAX
 
-/* Limiting the matrix dimension to the maximum size allowable by CBLAS/LAPACKE interface  */
+/* Limiting the matrix dimension to the maximum size allowable by CBLAS/LAPACKE interface. */
 #define NEONRVM_MAT_DIM_MAX INT32_MAX
 
 /******************************************************************************
@@ -115,7 +115,7 @@ lapack_int LAPACKE_dpotrs(int matrix_layout, char uplo, lapack_int n, lapack_int
 NEONRVM_STATIC void* nextend(void* mem_addr, size_t count, size_t size, bool keep_content)
 {
     if ((0 == count) || (0 == size) || (count > SIZE_MAX / size)) {
-        assert(0);
+        assert(false);
         abort();
     }
 
@@ -132,7 +132,7 @@ NEONRVM_STATIC void* nextend(void* mem_addr, size_t count, size_t size, bool kee
     }
 
     if (NULL == addr) {
-        assert(0);
+        assert(false);
         abort();
     }
 
@@ -147,7 +147,7 @@ NEONRVM_STATIC void* nmalloc(size_t count, size_t size)
 NEONRVM_STATIC void nfree(void* mem_addr)
 {
     if (NULL == mem_addr) {
-        assert(0);
+        assert(false);
         abort();
     }
 
@@ -202,18 +202,18 @@ struct neonrvm_cache {
 NEONRVM_API int neonrvm_create_cache(neonrvm_cache** cache, double* y, size_t count)
 {
     if (NULL == cache) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P1;
     }
 
     if ((NULL == y) || (false == is_finite(y, count))) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P2;
     }
 
     if ((2 > count) || (NEONRVM_MAT_DIM_MAX - 1 < count) || (SIZE_MAX / sizeof(double) < count)) {
         /* Reserved for bias ---------------- ^ */
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P3;
     }
 
@@ -251,7 +251,7 @@ NEONRVM_API int neonrvm_create_cache(neonrvm_cache** cache, double* y, size_t co
 NEONRVM_API int neonrvm_destroy_cache(neonrvm_cache* cache)
 {
     if ((NULL == cache) || (NEONRVM_STRUCT_MAGIC != cache->struct_initialized)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P1;
     }
 
@@ -298,37 +298,37 @@ struct neonrvm_param {
 NEONRVM_API int neonrvm_create_param(neonrvm_param** param, double alpha_init, double alpha_max, double alpha_tol, double beta_init, double basis_percent_min, size_t iter_max)
 {
     if (NULL == param) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P1;
     }
 
     if ((false == is_finite(&alpha_init, 1)) || (0.0 >= alpha_init)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P2;
     }
 
     if ((false == is_finite(&alpha_max, 1)) || (0.0 >= alpha_max) || (alpha_init >= alpha_max)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P3;
     }
 
     if ((false == is_finite(&alpha_tol, 1)) || (0.0 >= alpha_tol)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P4;
     }
 
     if ((false == is_finite(&beta_init, 1)) || (0.0 >= beta_init)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P5;
     }
 
     if ((false == is_finite(&basis_percent_min, 1)) || (0.0 > basis_percent_min) || (100.0 < basis_percent_min)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P6;
     }
 
     if (1 > iter_max) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P7;
     }
 
@@ -350,7 +350,7 @@ NEONRVM_API int neonrvm_create_param(neonrvm_param** param, double alpha_init, d
 NEONRVM_API int neonrvm_destroy_param(neonrvm_param* param)
 {
     if ((NULL == param) || (NEONRVM_STRUCT_MAGIC != param->struct_initialized)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P1;
     }
 
@@ -368,7 +368,7 @@ NEONRVM_STATIC void resize_cache(neonrvm_cache* c)
     /* grow reserved memory space for basis functions by 1.5x */
     if (c->n > 2 * (SIZE_MAX / 3)) {
         /* avoid unsigned integer wrapping */
-        assert(0);
+        assert(false);
         abort();
     }
     c->n_reserved = (3 * c->n) / 2;
@@ -376,7 +376,7 @@ NEONRVM_STATIC void resize_cache(neonrvm_cache* c)
     /* reallocate space */
     if (c->m > SIZE_MAX / c->n_reserved) {
         /* avoid unsigned integer wrapping */
-        assert(0);
+        assert(false);
         abort();
     }
     size_t mat_count = c->n_reserved * c->n_reserved;
@@ -502,7 +502,7 @@ NEONRVM_STATIC int calc_factor(neonrvm_cache* c)
 {
     int status = LAPACKE_dpotrf(LAPACK_COL_MAJOR, 'U', c->n, c->m_sigma, c->n);
     if (0 != status) {
-        assert(0);
+        assert(false);
         return NEONRVM_LAPACK_ERROR;
     }
 
@@ -516,7 +516,7 @@ NEONRVM_STATIC int calc_mu(neonrvm_cache* c)
 
     int status = LAPACKE_dpotrs(LAPACK_COL_MAJOR, 'U', c->n, 1, c->m_sigma, c->n, c->v_mu, c->n);
     if (0 != status) {
-        assert(0);
+        assert(false);
         return NEONRVM_LAPACK_ERROR;
     }
 
@@ -533,7 +533,7 @@ NEONRVM_STATIC int calc_gamma(neonrvm_cache* c)
 
     int status = LAPACKE_dpotrs(LAPACK_COL_MAJOR, 'U', c->n, c->n, c->m_sigma, c->n, c->m_alpha_diag, c->n);
     if (0 != status) {
-        assert(0);
+        assert(false);
         return NEONRVM_LAPACK_ERROR;
     }
 
@@ -609,17 +609,17 @@ NEONRVM_STATIC void filter_basis_funcs(neonrvm_cache* c, neonrvm_param* p)
 NEONRVM_STATIC int check_numbers(neonrvm_cache* c)
 {
     if (false == is_finite(c->v_mu, c->n)) {
-        assert(0);
+        assert(false);
         return NEONRVM_MATH_ERROR;
     }
 
     if (false == is_finite(c->v_alpha, c->n)) {
-        assert(0);
+        assert(false);
         return NEONRVM_MATH_ERROR;
     }
 
     if (false == is_finite(&c->beta, 1)) {
-        assert(0);
+        assert(false);
         return NEONRVM_MATH_ERROR;
     }
 
@@ -723,38 +723,38 @@ NEONRVM_API int neonrvm_train(neonrvm_cache* cache, neonrvm_param* param1, neonr
     int status = NEONRVM_SUCCESS;
 
     if ((NULL == cache) || (NEONRVM_STRUCT_MAGIC != cache->struct_initialized)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P1;
     }
 
     if ((NULL == param1) || (NEONRVM_STRUCT_MAGIC != param1->struct_initialized)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P2;
     }
 
     if ((NULL == param2) || (NEONRVM_STRUCT_MAGIC != param2->struct_initialized)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P3;
     }
 
     if ((NULL == phi) || (false == is_finite(phi, cache->m * count))) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P4;
     }
 
     if ((NULL == index) || contains_bias(index, count)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P5;
     }
 
     if ((1 > count) || (count > NEONRVM_MAT_DIM_MAX - cache->n - 1)) {
         /* Reserved for bias ----------------------------------- ^ */
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P6;
     }
 
     if (1 > batch_size_max) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P7;
     }
 
@@ -799,17 +799,17 @@ NEONRVM_API int neonrvm_train(neonrvm_cache* cache, neonrvm_param* param1, neonr
 NEONRVM_API int neonrvm_get_training_stats(neonrvm_cache* cache, size_t* basis_count, bool* bias_used)
 {
     if ((NULL == cache) || (NEONRVM_STRUCT_MAGIC != cache->struct_initialized)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P1;
     }
 
     if (NULL == basis_count) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P2;
     }
 
     if (NULL == bias_used) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P3;
     }
 
@@ -822,17 +822,17 @@ NEONRVM_API int neonrvm_get_training_stats(neonrvm_cache* cache, size_t* basis_c
 NEONRVM_API int neonrvm_get_training_results(neonrvm_cache* cache, size_t* index, double* mu)
 {
     if ((NULL == cache) || (NEONRVM_STRUCT_MAGIC != cache->struct_initialized)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P1;
     }
 
     if (NULL == index) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P2;
     }
 
     if (NULL == mu) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P3;
     }
 
@@ -849,27 +849,27 @@ NEONRVM_API int neonrvm_get_training_results(neonrvm_cache* cache, size_t* index
 NEONRVM_API int neonrvm_predict(double* phi, double* mu, size_t sample_count, size_t basis_count, double* y)
 {
     if ((NULL == phi) || (false == is_finite(phi, sample_count * basis_count))) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P1;
     }
 
     if ((NULL == mu) || (false == is_finite(mu, basis_count))) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P2;
     }
 
     if ((1 > sample_count) || (NEONRVM_MAT_DIM_MAX < sample_count)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P3;
     }
 
     if ((1 > basis_count) || (NEONRVM_MAT_DIM_MAX < basis_count)) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P4;
     }
 
     if (NULL == y) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P5;
     }
 
@@ -880,7 +880,7 @@ NEONRVM_API int neonrvm_predict(double* phi, double* mu, size_t sample_count, si
     }
 
     if (false == is_finite(y, sample_count)) {
-        assert(0);
+        assert(false);
         return NEONRVM_MATH_ERROR;
     }
 
@@ -894,17 +894,17 @@ NEONRVM_API int neonrvm_predict(double* phi, double* mu, size_t sample_count, si
 NEONRVM_API int neonrvm_get_version(int* major, int* minor, int* patch)
 {
     if (NULL == major) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P1;
     }
 
     if (NULL == minor) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P2;
     }
 
     if (NULL == patch) {
-        assert(0);
+        assert(false);
         return NEONRVM_INVALID_P3;
     }
 
