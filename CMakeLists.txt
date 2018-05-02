@@ -8,25 +8,11 @@ project(neonrvm
 # Required for common installation directories
 include(GNUInstallDirs)
 
-# Find CBLAS/LAPACKE libraries
+# Find BLAS/LAPACK libraries
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 message(STATUS "BLAS Libraries Found: ${BLAS_LIBRARIES}")
 message(STATUS "LAPACK Libraries Found: ${LAPACK_LIBRARIES}")
-
-# Workaround for Netlib providing separate BLAS/CBLAS and LAPACK/LAPACKE libraries
-foreach(BLASLIB ${BLAS_LIBRARIES})
-    string(REPLACE "libblas" "libcblas" CBLASLIB ${BLASLIB})
-    list(REMOVE_ITEM BLAS_LIBRARIES ${BLASLIB})
-    list(APPEND BLAS_LIBRARIES ${CBLASLIB})
-endforeach(BLASLIB)
-
-foreach(LAPACKLIB ${LAPACK_LIBRARIES})
-    string(REPLACE "liblapack" "liblapacke" LAPACKELIB ${LAPACKLIB})
-    string(REPLACE "libblas" "libcblas" LAPACKELIB ${LAPACKELIB})
-    list(REMOVE_ITEM LAPACK_LIBRARIES ${LAPACKLIB})
-    list(APPEND LAPACK_LIBRARIES ${LAPACKELIB})
-endforeach(LAPACKLIB)
 
 # Enable C99 standard
 set(CMAKE_C_STANDARD 99)

@@ -28,9 +28,9 @@ A C99 compiler is required in order to compile neonrvm, you can find one in
 every house these days. You also need [CMake] to configure and generate build 
 files.
 
-neonrvm requires a linear algebra library providing CBLAS/LAPACKE 
+neonrvm requires a linear algebra library providing BLAS/LAPACK 
 interface to do its magic. Popular ones are [Intel MKL], [OpenBLAS], and 
-the reference [Netlib LAPACKE].
+the reference [Netlib LAPACK].
 
 Python bindings can be installed from the source package using [Flit] Python 
 module by simply running:
@@ -46,7 +46,7 @@ pip install neonrvm
 [CMake]: https://cmake.org/
 [Intel MKL]: https://software.intel.com/mkl
 [OpenBLAS]: http://www.openblas.net/
-[Netlib LAPACKE]: http://www.netlib.org/lapack/
+[Netlib LAPACK]: http://www.netlib.org/lapack/
 [Flit]: https://github.com/takluyver/flit
 [PyPI]: https://pypi.python.org/pypi
 
@@ -304,7 +304,7 @@ int neonrvm_train(neonrvm_cache* cache, neonrvm_param* param1, neonrvm_param* pa
 *Returns*  
 - `NEONRVM_SUCCESS`: After successful execution.
 - `NEONRVM_INVALID_Px`: When facing erroneous parameters.
-- `NEONRVM_LAPACKE_ERROR`: When LAPACKE fails to perform factorization or solve 
+- `NEONRVM_LAPACK_ERROR`: When LAPACK fails to perform factorization or solve 
     equations.
 - `NEONRVM_MATH_ERROR`: When `NaN` or `∞` numbers show up in the calculations.
 

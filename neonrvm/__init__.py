@@ -97,7 +97,7 @@ def _gen_err_str(err_code):
     if err_code & 0x10:
         err_str += "Input parameter #{} passed to the C API is invalid.".format(err_code & 0x0F)
     elif err_code & 0x21:
-        err_str += "LAPACKE failed to factorize or solve equations."
+        err_str += "LAPACK failed to factorize or solve equations."
     elif err_code & 0x31:
         err_str += "There is NaN or ∞ numbers in calculations."
     else:

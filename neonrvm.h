@@ -28,7 +28,7 @@ extern "C" {
 #define NEONRVM_INVALID_P5 0x15
 #define NEONRVM_INVALID_P6 0x16
 #define NEONRVM_INVALID_P7 0x17
-#define NEONRVM_LAPACKE_ERROR 0x21
+#define NEONRVM_LAPACK_ERROR 0x21
 #define NEONRVM_MATH_ERROR 0x31
 
 typedef struct neonrvm_cache neonrvm_cache;
