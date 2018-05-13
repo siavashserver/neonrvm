@@ -96,9 +96,9 @@ def _gen_err_str(err_code):
 
     if err_code & 0x10:
         err_str += "Input parameter #{} passed to the C API is invalid.".format(err_code & 0x0F)
-    elif err_code & 0x21:
+    elif err_code & 0x20:
         err_str += "LAPACK failed to factorize or solve equations."
-    elif err_code & 0x31:
+    elif err_code & 0x40:
         err_str += "There is NaN or ∞ numbers in calculations."
     else:
         err_str += "Unknown error code has been returned by the C API."
