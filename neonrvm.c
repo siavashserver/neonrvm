@@ -10,85 +10,6 @@
 #include "neonrvm.h"
 
 /******************************************************************************
-* Implementing required CBLAS/LAPACKE functions over BLAS/LAPACK so we don't
-* have to deal with their non-standard packagings.
-* (Taken from Netlib's CBLAS/LAPACKE 3.8)
-******************************************************************************/
-
-/* CBLAS */
-extern double ddot_(const int* N, const double* X, const int* incX, const double* Y, const int* incY);
-extern void dscal_(const int* N, const double* alpha, double* X, const int* incX);
-extern void dgemv_(const char* TransA, const int* M, const int* N, const double* alpha, const double* A, const int* lda, const double* X, const int* incX, const double* beta, double* Y, const int* incY);
-extern void dgemm_(const char* TransA, const char* TransB, const int* M, const int* N, const int* K, const double* alpha, const double* A, const int* lda, const double* B, const int* ldb, const double* beta, double* C, const int* ldc);
-
-typedef enum { CblasRowMajor = 101,
-    CblasColMajor = 102 } CBLAS_LAYOUT;
-typedef enum { CblasNoTrans = 111,
-    CblasTrans = 112,
-    CblasConjTrans = 113 } CBLAS_TRANSPOSE;
-
-char translate_transpose(CBLAS_TRANSPOSE transpose)
-{
-    switch (transpose) {
-    case CblasNoTrans:
-        return 'N';
-    case CblasTrans:
-        return 'T';
-    case CblasConjTrans:
-        return 'C';
-    default:
-        /* unknown value passed in */
-        assert(false);
-        abort();
-    }
-}
-
-double cblas_ddot(const int N, const double* X, const int incX, const double* Y, const int incY)
-{
-    return ddot_(&N, X, &incX, Y, &incY);
-}
-
-void cblas_dscal(const int N, const double alpha, double* X, const int incX)
-{
-    dscal_(&N, &alpha, X, &incX);
-}
-
-void cblas_dgemv(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE TransA, const int M, const int N, const double alpha, const double* A, const int lda, const double* X, const int incX, const double beta, double* Y, const int incY)
-{
-    char _TransA = translate_transpose(TransA);
-    dgemv_(&_TransA, &M, &N, &alpha, A, &lda, X, &incX, &beta, Y, &incY);
-}
-
-void cblas_dgemm(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE TransA, CBLAS_TRANSPOSE TransB, const int M, const int N, const int K, const double alpha, const double* A, const int lda, const double* B, const int ldb, const double beta, double* C, const int ldc)
-{
-    char _TransA = translate_transpose(TransA);
-    char _TransB = translate_transpose(TransB);
-    dgemm_(&_TransA, &_TransB, &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta, C, &ldc);
-}
-
-/* LAPACKE */
-extern void dpotrf_(const char* uplo, const int* n, double* a, const int* lda, int* info);
-extern void dpotrs_(const char* uplo, const int* n, const int* nrhs, const double* a, const int* lda, double* b, const int* ldb, int* info);
-
-#define lapack_int int
-#define LAPACK_ROW_MAJOR 101
-#define LAPACK_COL_MAJOR 102
-
-lapack_int LAPACKE_dpotrf(int matrix_layout, char uplo, lapack_int n, double* a, lapack_int lda)
-{
-    int info = 0;
-    dpotrf_(&uplo, &n, a, &lda, &info);
-    return info;
-}
-
-lapack_int LAPACKE_dpotrs(int matrix_layout, char uplo, lapack_int n, lapack_int nrhs, const double* a, lapack_int lda, double* b, lapack_int ldb)
-{
-    int info = 0;
-    dpotrs_(&uplo, &n, &nrhs, a, &lda, b, &ldb, &info);
-    return info;
-}
-
-/******************************************************************************
 * neonrvm specific macro definitions
 ******************************************************************************/
 
@@ -107,6 +28,85 @@ lapack_int LAPACKE_dpotrs(int matrix_layout, char uplo, lapack_int n, lapack_int
 
 /* Limiting the matrix dimension to the maximum size allowable by CBLAS/LAPACKE interface. */
 #define NEONRVM_MAT_DIM_MAX INT32_MAX
+
+/******************************************************************************
+* Implementing required CBLAS/LAPACKE functions over BLAS/LAPACK so we don't
+* have to deal with their non-standard packagings.
+* (Taken from Netlib's CBLAS/LAPACKE 3.8)
+******************************************************************************/
+
+/* CBLAS */
+extern double ddot_(const int* N, const double* X, const int* incX, const double* Y, const int* incY);
+extern void dscal_(const int* N, const double* alpha, double* X, const int* incX);
+extern void dgemv_(const char* TransA, const int* M, const int* N, const double* alpha, const double* A, const int* lda, const double* X, const int* incX, const double* beta, double* Y, const int* incY);
+extern void dgemm_(const char* TransA, const char* TransB, const int* M, const int* N, const int* K, const double* alpha, const double* A, const int* lda, const double* B, const int* ldb, const double* beta, double* C, const int* ldc);
+
+typedef enum { CblasRowMajor = 101,
+    CblasColMajor = 102 } CBLAS_LAYOUT;
+typedef enum { CblasNoTrans = 111,
+    CblasTrans = 112,
+    CblasConjTrans = 113 } CBLAS_TRANSPOSE;
+
+NEONRVM_STATIC char translate_transpose(CBLAS_TRANSPOSE transpose)
+{
+    switch (transpose) {
+    case CblasNoTrans:
+        return 'N';
+    case CblasTrans:
+        return 'T';
+    case CblasConjTrans:
+        return 'C';
+    default:
+        /* unknown value passed in */
+        assert(false);
+        abort();
+    }
+}
+
+NEONRVM_STATIC double cblas_ddot(const int N, const double* X, const int incX, const double* Y, const int incY)
+{
+    return ddot_(&N, X, &incX, Y, &incY);
+}
+
+NEONRVM_STATIC void cblas_dscal(const int N, const double alpha, double* X, const int incX)
+{
+    dscal_(&N, &alpha, X, &incX);
+}
+
+NEONRVM_STATIC void cblas_dgemv(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE TransA, const int M, const int N, const double alpha, const double* A, const int lda, const double* X, const int incX, const double beta, double* Y, const int incY)
+{
+    char _TransA = translate_transpose(TransA);
+    dgemv_(&_TransA, &M, &N, &alpha, A, &lda, X, &incX, &beta, Y, &incY);
+}
+
+NEONRVM_STATIC void cblas_dgemm(CBLAS_LAYOUT layout, CBLAS_TRANSPOSE TransA, CBLAS_TRANSPOSE TransB, const int M, const int N, const int K, const double alpha, const double* A, const int lda, const double* B, const int ldb, const double beta, double* C, const int ldc)
+{
+    char _TransA = translate_transpose(TransA);
+    char _TransB = translate_transpose(TransB);
+    dgemm_(&_TransA, &_TransB, &M, &N, &K, &alpha, A, &lda, B, &ldb, &beta, C, &ldc);
+}
+
+/* LAPACKE */
+extern void dpotrf_(const char* uplo, const int* n, double* a, const int* lda, int* info);
+extern void dpotrs_(const char* uplo, const int* n, const int* nrhs, const double* a, const int* lda, double* b, const int* ldb, int* info);
+
+#define lapack_int int
+#define LAPACK_ROW_MAJOR 101
+#define LAPACK_COL_MAJOR 102
+
+NEONRVM_STATIC lapack_int LAPACKE_dpotrf(int matrix_layout, char uplo, lapack_int n, double* a, lapack_int lda)
+{
+    int info = 0;
+    dpotrf_(&uplo, &n, a, &lda, &info);
+    return info;
+}
+
+NEONRVM_STATIC lapack_int LAPACKE_dpotrs(int matrix_layout, char uplo, lapack_int n, lapack_int nrhs, const double* a, lapack_int lda, double* b, lapack_int ldb)
+{
+    int info = 0;
+    dpotrs_(&uplo, &n, &nrhs, a, &lda, b, &ldb, &info);
+    return info;
+}
 
 /******************************************************************************
 * Utility functions
