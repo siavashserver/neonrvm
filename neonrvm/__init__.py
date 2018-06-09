@@ -1,5 +1,5 @@
 """Python bindings for the neonrvm machine learning library."""
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 import ctypes as ct
 import ctypes.util as ctut

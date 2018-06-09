@@ -14,8 +14,8 @@
 ******************************************************************************/
 
 #define NEONRVM_VERSION_MAJOR 0
-#define NEONRVM_VERSION_MINOR 1
-#define NEONRVM_VERSION_PATCH 1
+#define NEONRVM_VERSION_MINOR 2
+#define NEONRVM_VERSION_PATCH 0
 
 /* Defining private functions as static helps keeping library size low. */
 #define NEONRVM_STATIC static

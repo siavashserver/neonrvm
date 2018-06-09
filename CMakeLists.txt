@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 
 project(neonrvm
-    VERSION 0.1.1
+    VERSION 0.2.0
     DESCRIPTION "Machine learning library"
     LANGUAGES C)
 
