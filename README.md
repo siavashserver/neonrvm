@@ -244,8 +244,9 @@ Different scenarios are discussed below:
 ### A) Optimizing kernel parameters
 
 During this period one needs to rapidly try different kernel parameters either 
-using an optimization algorithm ([SciPy] to the rescue) or brute force method 
-to achieve optimal kernel parameters.
+using an optimization algorithm ([Hyperopt] to the rescue) or brute force method 
+to achieve optimal kernel parameters. Make sure that the optimization algorithm 
+can deal with possible training failures.
 
 In this case users need to use small batch sizes, and training parameters with 
 more relaxed convergence conditions. In other words, a highly polished and 
@@ -318,7 +319,7 @@ def train(cache: Cache, param1: Param, param2: Param,
 *Returns*  
 - Nothing that I'm aware of.
 
-[SciPy]: https://www.scipy.org/
+[Hyperopt]: https://github.com/hyperopt/hyperopt
 
 ## Step 5: Getting the training results
 
