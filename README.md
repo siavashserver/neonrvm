@@ -2,6 +2,11 @@
 <img src="https://siavashserver.github.io/neonrvm/neonrvm.svg" alt="neonrvm_logo" title="neonrvm">
 </p>
 
+![GitHub](https://img.shields.io/github/license/siavashserver/neonrvm?style=flat-square)
+![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/siavashserver/neonrvm?include_prereleases&style=flat-square)
+![GitHub stars](https://img.shields.io/github/stars/siavashserver/neonrvm?style=flat-square)
+![PyPI - Status](https://img.shields.io/pypi/status/neonrvm?style=flat-square)
+
 # Introduction
 
 **neonrvm** is an open source machine learning library for performing regression
