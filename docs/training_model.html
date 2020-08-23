@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Training the model - neonrvm</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="neonrvm users guide.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="building.html"><strong aria-hidden="true">1.</strong> Building neonrvm</a></li><li class="chapter-item expanded "><a href="using.html"><strong aria-hidden="true">2.</strong> Using neonrvm</a></li><li class="chapter-item expanded "><a href="data.html"><strong aria-hidden="true">3.</strong> Data preparation</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="design_matrix.html"><strong aria-hidden="true">3.1.</strong> Design matrix preparation</a></li><li class="chapter-item expanded "><a href="training_cache.html"><strong aria-hidden="true">3.2.</strong> Creating training cache</a></li><li class="chapter-item expanded "><a href="training_parameters.html"><strong aria-hidden="true">3.3.</strong> Creating training parameters</a></li><li class="chapter-item expanded "><a href="training_model.html" class="active"><strong aria-hidden="true">3.4.</strong> Training the model</a></li><li class="chapter-item expanded "><a href="training_results.html"><strong aria-hidden="true">3.5.</strong> Getting the training results</a></li><li class="chapter-item expanded "><a href="predict.html"><strong aria-hidden="true">3.6.</strong> Making predictions</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="license.html">License</a></li><li class="chapter-item expanded affix "><a href="future.html">Future work</a></li><li class="chapter-item expanded affix "><a href="reference.html">Reference</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">neonrvm</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        <a href="https://github.com/siavashserver/neonrvm" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#training-the-model" id="training-the-model">Training the model</a></h1>
+<p><code>neonrvm_train</code> function requires a pair of training parameter structures, one
+for just getting rid of pretty useless basis functions, and another one for
+polishing the training results. In the first one you usually want to keep
+majority of basis functions, while in the last one you want to reduce number of
+basis functions as much as possible in order to achieve a more general and
+sparse model.</p>
+<p>By choosing a <em>batch size</em> value smaller than total input basis function count,
+the model will be trained incrementally using the first training parameter
+structure, and will get polished using the last training parameter structure in
+the end.</p>
+<p>neonrvm has been carefully designed to handle multiple training scenarios.
+Different scenarios are discussed below:</p>
+<h2><a class="header" href="#a-optimizing-kernel-parameters" id="a-optimizing-kernel-parameters">A) Optimizing kernel parameters</a></h2>
+<p>During this period one needs to rapidly try different kernel parameters either
+using an optimization algorithm (<a href="https://github.com/hyperopt/hyperopt">Hyperopt</a> to the rescue) or brute force method
+to achieve optimal kernel parameters. Make sure that the optimization algorithm
+can deal with possible training failures.</p>
+<p>In this case users need to use small batch sizes, and training parameters with
+more relaxed convergence conditions. In other words, a highly polished and
+sparse model isn't required.</p>
+<h2><a class="header" href="#b-finalized-kernel-parameters-and-model" id="b-finalized-kernel-parameters-and-model">B) Finalized kernel parameters and model</a></h2>
+<p>When you are finished with tuning kernel parameters and trying different model
+creation ideas, you need access to the best basis functions and finely tuned
+weights associated to them in order to make accurate predictions.</p>
+<p>You need to throw bigger training batch sizes at neonrvm, and use training
+parameters with low basis function percentage and high iteration count for the
+polishing step in this case.</p>
+<h2><a class="header" href="#-big-data-sets" id="-big-data-sets">🍔) Big data sets</a></h2>
+<p>Memory and storage requirements do quickly skyrocket when dealing with large
+data sets. You don't necessarily need to feed the whole design matrix to the
+neonrvm all at once. It can also be fed in smaller chunks by loading different
+design matrix parts from disk, or simply generating them on the fly.</p>
+<p>neonrvm allows users to split the design matrix and perform the training process
+incrementally at higher level through caching mechanism provided. You just need
+to make multiple <code>neonrvm_train</code> function calls and neonrvm will store the
+useful basis functions in the given <code>neonrvm_cache</code> on the go.</p>
+<p>It is a good idea to group together similar data using <a href="https://en.wikipedia.org/wiki/Cluster_analysis">clustering</a> algorithms,
+and feed neonrvm with a mixture of them incrementally.</p>
+<h2><a class="header" href="#-cc" id="-cc">🚀 C/C++</a></h2>
+<p>Alright, now that we covered the different use cases, it's time to get familiar
+with the <code>neonrvm_train</code> function:</p>
+<pre><code class="language-C">int neonrvm_train(neonrvm_cache* cache, neonrvm_param* param1, neonrvm_param* param2,
+                  double* phi, size_t* index, size_t count, size_t batch_size_max)
+</code></pre>
+<p>➡️ <em>Parameters</em></p>
+<ul>
+<li>⬇️ <code>[in] cache</code>: Stores intermediate variables and training results.</li>
+<li>⬇️ <code>[in] param1</code>: Incremental training parameters.</li>
+<li>⬇️ <code>[in] param2</code>: Final polish parameters.</li>
+<li>⬇️ <code>[in] phi</code>: Column major design matrix, with row count equivalent to the
+total sample count, and column count equivalent to the given basis function
+<em>count</em>. A copy of useful basis functions will be kept inside the training
+<em>cache</em>.</li>
+<li>⬇️ <code>[in] index</code>: Basis function indices, a vector with elements count
+equivalent to the given basis function <em>count</em>. A copy of useful basis
+function indices will be kept inside the training <em>cache</em>. Must be a vector
+of positive numbers, and shouldn't contain any value equal to the
+<code>SIZE_MAX</code>, which is used internally to identify bias index.</li>
+<li>⬇️ <code>[in] count</code>: Number of basis functions given. Must be a positive non-zero
+number.</li>
+<li>⬇️ <code>[in] batch_size_max</code>: Maximum number of basis functions in every
+incremental training session. Must be a positive non-zero value.</li>
+</ul>
+<p>⬅️ <em>Returns</em></p>
+<ul>
+<li><code>NEONRVM_SUCCESS</code>: After successful execution.</li>
+<li><code>NEONRVM_INVALID_Px</code>: When facing erroneous parameters.</li>
+<li><code>NEONRVM_LAPACK_ERROR</code>: When LAPACK fails to perform factorization or solve
+equations.</li>
+<li><code>NEONRVM_MATH_ERROR</code>: When <code>NaN</code> or <code>∞</code> numbers show up in the calculations.</li>
+</ul>
+<h2><a class="header" href="#-python" id="-python">🐍 Python</a></h2>
+<pre><code class="language-Python">def train(cache: Cache, param1: Param, param2: Param,
+          phi: numpy.ndarray, index: numpy.ndarray, batch_size_max: int)
+</code></pre>
+<p>➡️ <em>Parameters</em></p>
+<ul>
+<li>⬇️ <code>[in] cache</code>: Stores intermediate variables and training results.</li>
+<li>⬇️ <code>[in] param1</code>: Incremental training parameters.</li>
+<li>⬇️ <code>[in] param2</code>: Final polish parameters.</li>
+<li>⬇️ <code>[in] phi</code>: Column major design matrix, with row count equivalent to the
+total sample count, and column count equivalent to the given basis function
+<em>count</em>. A copy of useful basis functions will be kept inside the training
+<em>cache</em>.</li>
+<li>⬇️ <code>[in] index</code>: Basis function indices, a vector with elements count
+equivalent to the given basis function <em>count</em>. A copy of useful basis
+function indices will be kept inside the training <em>cache</em>. Must be a vector
+of positive numbers, and shouldn't contain any value equal to the
+<code>SIZE_MAX</code>, which is used internally to identify bias index.</li>
+<li>⬇️ <code>[in] batch_size_max</code>: Maximum number of basis functions in every
+incremental training session. Must be a positive non-zero value.</li>
+</ul>
+<p>⬅️ <em>Returns</em></p>
+<ul>
+<li>Nothing that I'm aware of.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="training_parameters.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="training_results.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="training_parameters.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="training_results.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+        <!-- Google Analytics Tag -->
+        <script type="text/javascript">
+            var localAddrs = ["localhost", "127.0.0.1", ""];
+
+            // make sure we don't activate google analytics if the developer is
+            // inspecting the book locally...
+            if (localAddrs.indexOf(document.location.hostname) === -1) {
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-172493032-1', 'auto');
+                ga('send', 'pageview');
+            }
+        </script>
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

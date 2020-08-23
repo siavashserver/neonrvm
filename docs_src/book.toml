@@ -1,0 +1,13 @@
+[book]
+title = "neonrvm"
+authors = ["Siavash Eliasi"]
+description = "neonrvm users guide."
+language = "en"
+multilingual = false
+src = "src"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "ayu"
+git-repository-url = "https://github.com/siavashserver/neonrvm"
+google-analytics = "UA-172493032-1"
